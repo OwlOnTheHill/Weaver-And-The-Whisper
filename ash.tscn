@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://d0wdgmmrwbx5c"]
+
+[ext_resource type="Script" uid="uid://c7oahjcvc8fh4" path="res://ash.gd" id="1_xukp1"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_crx4v"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_xukp1"]
+
+[sub_resource type="MeshTexture" id="MeshTexture_21xbq"]
+mesh = SubResource("CapsuleMesh_xukp1")
+image_size = Vector2(20, 30)
+
+[node name="Ash" type="CharacterBody2D" unique_id=473811338]
+script = ExtResource("1_xukp1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1986543522]
+shape = SubResource("CapsuleShape2D_crx4v")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1282588241]
+texture = SubResource("MeshTexture_21xbq")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1890297834]
+position_smoothing_enabled = true
