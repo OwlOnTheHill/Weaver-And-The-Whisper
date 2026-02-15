@@ -21,3 +21,7 @@ texture = SubResource("MeshTexture_21xbq")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1890297834]
 position_smoothing_enabled = true
+
+[node name="CoyoteTimer" type="Timer" parent="." unique_id=1494018096]
+wait_time = 0.15
+one_shot = true
