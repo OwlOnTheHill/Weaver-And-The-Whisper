@@ -6,9 +6,9 @@ var current_state = State.IDLE
 var state_just_changed = false
 
 #MOVEMENT SETTINGS
-const SPEED = 200.0
-const SPRINT = 350.0
-const JUMP_VELOCITY = 400.0
+const SPEED = 150.0
+const SPRINT = 250.0
+const JUMP_VELOCITY = 300.0
 const WALL_GRAVITY = Vector2(0, 500)
 
 #GAMEPLAY FLAGS
@@ -67,7 +67,7 @@ func handle_idle_state(_delta: float):
 		
 	if not $JumpBufferTimer.is_stopped():
 		if is_on_floor() or not $CoyoteTimer.is_stopped():
-			change_state(State.MOVE)
+			change_state(State.JUMP)
 		
 	if Input.is_action_just_pressed("attack") and is_combat_mode and not is_attacking:
 		change_state(State.ATTACK)
@@ -86,7 +86,7 @@ func handle_move_state(delta: float):
 	
 	if not $JumpBufferTimer.is_stopped():
 		if is_on_floor() or not $CoyoteTimer.is_stopped():
-			sprinting_before_jump = Input.is_action_just_pressed("sprint")
+			sprinting_before_jump = Input.is_action_pressed("sprint")
 			change_state(State.JUMP)
 	
 	if Input.is_action_just_pressed("attack") and is_combat_mode and not is_attacking:

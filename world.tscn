@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://d0wdgmmrwbx5c" path="res://ash.tscn" id="1_f3sb7"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fj7yv"]
-size = Vector2(1153, 141)
+size = Vector2(1152, 140)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f3sb7"]
 bg_color = Color(0, 0, 0, 1)
@@ -39,7 +39,7 @@ border_color = Color(1, 1, 1, 1)
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=2049523714]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1345303952]
-position = Vector2(575.5, 70.5)
+position = Vector2(575, 71)
 shape = SubResource("RectangleShape2D_fj7yv")
 
 [node name="Panel" type="Panel" parent="StaticBody2D" unique_id=1227156542]
