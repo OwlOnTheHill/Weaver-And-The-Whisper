@@ -6,10 +6,10 @@ var current_state = State.IDLE
 var state_just_changed = false
 
 #MOVEMENT SETTINGS
-const SPEED = 4.5
-const SPRINT = 10.0
-const JUMP_VELOCITY = 5.5
-const WALL_GRAVITY = Vector2(0, 50)
+const SPEED = 200.0
+const SPRINT = 350.0
+const JUMP_VELOCITY = 400.0
+const WALL_GRAVITY = Vector2(0, 500)
 
 #GAMEPLAY FLAGS
 var is_combat_mode = false
@@ -30,6 +30,9 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if Input.is_action_just_pressed("jump"):
+		$JumpBufferTimer.start()
+	
 	apply_gravity(delta)
 	handle_coyote_time()
 	
@@ -59,10 +62,10 @@ func handle_idle_state(_delta: float):
 	velocity.x = move_toward(velocity.x, 0, SPEED)
 	
 	#transitions
-	if Input.axis("move_left", "move_right"):
+	if Input.get_axis("move_left", "move_right"):
 		change_state(State.MOVE)
 		
-	if Input.is_action_just_pressed("jump"):
+	if not $JumpBufferTimer.is_stopped():
 		if is_on_floor() or not $CoyoteTimer.is_stopped():
 			change_state(State.MOVE)
 		
@@ -81,7 +84,7 @@ func handle_move_state(delta: float):
 		change_state(State.IDLE)
 		return
 	
-	if Input.is_action_just_pressed("jump"):
+	if not $JumpBufferTimer.is_stopped():
 		if is_on_floor() or not $CoyoteTimer.is_stopped():
 			sprinting_before_jump = Input.is_action_just_pressed("sprint")
 			change_state(State.JUMP)
@@ -93,21 +96,22 @@ func handle_move_state(delta: float):
 	var target_speed = SPRINT if sprinting and (is_on_floor() or sprinting_before_jump) else SPEED
 	
 	if direction:
-		velocity.x = direction.x * target_speed
+		velocity.x = direction * target_speed
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
 
 
 func handle_jump_state(delta: float):
-	var input_dir = Input.get_vector("move_left", "move_right", "down")
+	var direction = Input.get_axis("move_left", "move_right")
 	
 	var speed = SPRINT if sprinting_before_jump else SPEED
-	velocity.x = direction.x * speed
+	velocity.x = direction * speed
 
 	if state_just_changed:
-		velocity.y = JUMP_VELOCITY
+		velocity.y = -JUMP_VELOCITY
 		state_just_changed = false
+		$JumpBufferTimer.stop()
 	
 	if is_on_floor():
 		change_state(State.IDLE)
@@ -124,8 +128,8 @@ func handle_attack_state(_delta: float):
 
 func execute_attack_animation():
 	is_attacking = true
-	hitbox.monitoring = true
-	already_hit_targets.clear()
+	#hitbox.monitoring = true
+	#already_hit_targets.clear()
 	
 	#swing_audio.pitch_scale = randf_range(0.9, 1.1)
 	#swing_audio.play()
@@ -145,10 +149,10 @@ func execute_attack_animation():
 
 
 func handle_combat_idle_state(delta: float):
-	if Input.is_action_just_pressed("move_left", "move_right", "down") != Vector2.ZERO:
+	if Input.get_axis("move_left", "move_right") != 0:
 		change_state(State.COMBAT_MOVE)
 	
-	if Input.is_action_just_pressed("jump"):
+	if not $JumpBufferTimer.is_stopped():
 		if is_on_floor() or not $CoyoteTimer.is_stopped():
 			change_state(State.JUMP)
 	
@@ -158,14 +162,14 @@ func handle_combat_idle_state(delta: float):
 
 
 func handle_combat_move_state(delta: float):
-	var input_dir = Input.get_vector("move_left", "move_right", "down")
+	var direction = Input.get_axis("move_left", "move_right")
 	
-	velocity.x = direction.x * SPEED
+	velocity.x = direction * SPEED
 	
-	if input_dir == Vector2.ZERO:
+	if direction == 0:
 		change_state(State.COMBAT_IDLE)
 		
-	if Input.is_action_just_pressed("jump"):
+	if not $JumpBufferTimer.is_stopped():
 		if is_on_floor() or not $CoyoteTimer.is_stopped():
 			change_state(State.JUMP)
 	
