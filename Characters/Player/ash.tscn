@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://d0wdgmmrwbx5c"]
 
-[ext_resource type="Script" uid="uid://c7oahjcvc8fh4" path="res://ash.gd" id="1_xukp1"]
-[ext_resource type="Script" uid="uid://dma2tnms3pih3" path="res://camera_follow.gd" id="2_21xbq"]
+[ext_resource type="Script" uid="uid://c7oahjcvc8fh4" path="res://Characters/Player/ash.gd" id="1_xukp1"]
+[ext_resource type="Script" uid="uid://dma2tnms3pih3" path="res://Characters/Player/camera_follow.gd" id="2_21xbq"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_21xbq"]
 radius = 11.0

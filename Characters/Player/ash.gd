@@ -16,11 +16,12 @@ const WALL_GRAVITY = Vector2(0, 500)
 
 # Variable Gravity Settings
 var fall_gravity_multiplier = 1.0
-const MAX_GRAVITY_MULTIPLIER = 1.5 # Maximum gravity increase (1.5x normal)
-const GRAVITY_RAMP_SPEED = 1.5 # How fast gravity increases per second
+const MAX_GRAVITY_MULTIPLIER = 1.5 
+const GRAVITY_RAMP_SPEED = 1.5 
 
 # ABILITY UNLOCKS
-var double_jump_unlocked = false # Set this to true later in the game
+var double_jump_unlocked = false 
+var dash_unlocked = false # DASH IS NOW LOCKED BY DEFAULT
 var current_jumps = 0
 const MAX_JUMPS = 2
 
@@ -28,7 +29,7 @@ const MAX_JUMPS = 2
 var is_combat_mode = false
 var was_on_floor = false
 var is_attacking = false
-var can_dash = true
+var can_dash = true # Runtime flag (can I dash *right now*?)
 var dash_direction = 0
 var dash_time_left = 0.0
 
@@ -46,7 +47,6 @@ func _physics_process(delta: float) -> void:
 	if current_state != State.DASH:
 		apply_gravity(delta)
 	else:
-		# Reset gravity buildup while dashing
 		fall_gravity_multiplier = 1.0
 	
 	handle_coyote_time()
@@ -55,7 +55,7 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor():
 		can_dash = true
 		current_jumps = 0
-		fall_gravity_multiplier = 1.0 # Reset gravity accumulation
+		fall_gravity_multiplier = 1.0 
 	
 	#STATE MACHINE SWITCHER
 	match current_state:
@@ -131,7 +131,7 @@ func handle_jump_state(delta: float):
 	if state_just_changed:
 		velocity.y = -JUMP_VELOCITY
 		current_jumps += 1
-		fall_gravity_multiplier = 1.0 # Reset gravity on new jump
+		fall_gravity_multiplier = 1.0 
 		state_just_changed = false
 		$JumpBufferTimer.stop()
 	
@@ -141,7 +141,6 @@ func handle_jump_state(delta: float):
 	if is_on_floor():
 		change_state(State.IDLE)
 	
-	# Check for Double Jump
 	check_double_jump()
 	try_dash()
 
@@ -152,12 +151,10 @@ func handle_fall_state(delta):
 	if is_on_floor():
 		change_state(State.IDLE)
 		
-	# Standard Ground Jump (Coyote Time)
 	if not $JumpBufferTimer.is_stopped():
 		if is_on_floor() or not $CoyoteTimer.is_stopped():
 			change_state(State.JUMP)
 	
-	# Check for Double Jump
 	check_double_jump()
 	try_dash()
 	
@@ -167,7 +164,6 @@ func handle_fall_state(delta):
 func check_double_jump():
 	if Input.is_action_just_pressed("jump") and double_jump_unlocked:
 		if current_jumps < MAX_JUMPS:
-			# Force state change back to JUMP even if we are already jumping/falling
 			change_state(State.JUMP)
 
 func handle_dash_state(delta: float):
@@ -177,7 +173,6 @@ func handle_dash_state(delta: float):
 		$DashTimer.start()
 		can_dash = false 
 		
-		# Direction is already guaranteed by try_dash(), but we check again for safety
 		var input_dir = Input.get_axis("move_left", "move_right")
 		if input_dir != 0:
 			dash_direction = input_dir
@@ -238,28 +233,23 @@ func handle_combat_move_state(delta: float):
 	try_dash()
 
 func try_dash():
-	# 1. Pressed Dash Button
-	# 2. Can Dash (not on cooldown, not used in air yet)
-	# 3. Cooldown Timer is finished
-	# 4. HAS INPUT DIRECTION
-	if Input.is_action_just_pressed("dash") and can_dash and $DashTimer.is_stopped():
+	# 1. Input Check
+	# 2. Ability Unlocked Check (dash_unlocked)
+	# 3. Runtime Check (can_dash, cooldown)
+	# 4. Direction Check
+	if Input.is_action_just_pressed("dash") and dash_unlocked and can_dash and $DashTimer.is_stopped():
 		if Input.get_axis("move_left", "move_right") != 0:
 			change_state(State.DASH)
 
 func apply_gravity(delta):
 	if not is_on_floor():
-		# Wall Slide Gravity ONLY when falling
 		if is_on_wall_only() and velocity.y > 0:
 			velocity += WALL_GRAVITY * delta
-			# Reset multiplier on wall slide so you don't plummet after leaving wall
 			fall_gravity_multiplier = 1.0 
 		else:
-			# Variable Fall Gravity
-			if velocity.y > 0: # If falling
-				# Increase multiplier over time
+			if velocity.y > 0: 
 				fall_gravity_multiplier = move_toward(fall_gravity_multiplier, MAX_GRAVITY_MULTIPLIER, GRAVITY_RAMP_SPEED * delta)
 			else:
-				# Reset if rising (jumping up)
 				fall_gravity_multiplier = 1.0
 			
 			velocity += get_gravity() * fall_gravity_multiplier * delta
